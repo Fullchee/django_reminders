@@ -3,7 +3,7 @@ from django.http import HttpResponse, JsonResponse
 
 
 def ping(request):
-    return HttpResponse("Pong!")
+    return render(request, 'api/PingTemplate.html')
 
 
 def random_link(request):
