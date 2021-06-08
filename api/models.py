@@ -1,6 +1,8 @@
 from django.db import models
 from django.contrib.postgres.fields import ArrayField
 from django.contrib.auth.models import User
+from django.forms import ModelForm
+
 
 class Link(models.Model):
     title = models.CharField(max_length=200, null=True)
@@ -33,3 +35,9 @@ class Quote(models.Model):
 
     def __str__(self):
         return self.text
+
+
+class LinkForm(ModelForm):
+    class Meta:
+        model = Link
+        fields = '__all__'

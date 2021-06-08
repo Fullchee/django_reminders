@@ -82,6 +82,9 @@ def search(request):
 
 
 def add_link(request):
+    if request.method == 'POST':
+        print(request)
+        print(request.POST)
     return JsonResponse({})
 
 

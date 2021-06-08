@@ -8,6 +8,7 @@ urlpatterns = [
     path('keywords', views.get_keywords),
     path('link/<int:link_id>', views.get_link),
     path('search', views.search),
-    path('add_link', views.add_link),
-    path('update_link', views.update_link),
+    path('add-link', views.add_link),
+    path('update-link', views.update_link),
+    path('delete-link', views.delete_link),
 ]
