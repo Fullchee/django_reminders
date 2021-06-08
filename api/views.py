@@ -36,8 +36,15 @@ def ping(request):
     return render(request, 'api/PingTemplate.html')
 
 
-def random_link(request):
-    return JsonResponse({})
+def get_random_link(request):
+    with connection.cursor() as cursor:
+        cursor.execute(sql_text('''
+            SELECT * FROM api_link
+            ORDER BY RANDOM()
+            LIMIT 1
+        '''))
+        result = fetchall_as_dict(cursor)
+        return JsonResponse(result)
 
 
 def get_all_links(request):
@@ -47,12 +54,27 @@ def get_all_links(request):
         return JsonResponse(result)
 
 
-def keywords(request):
-    return JsonResponse({})
+def get_keywords(request):
+    with connection.cursor() as cursor:
+        cursor.execute(sql_text('''
+            SELECT DISTINCT UNNEST(keywords) AS keyword
+            FROM api_link
+        '''))
+        result = fetchall_as_dict(cursor)
+        return JsonResponse(sorted(map(lambda obj: obj['keyword'], result)))
 
 
-def link(request):
-    return JsonResponse({})
+def get_link(request, link_id):
+    with connection.cursor() as cursor:
+        cursor.execute(sql_text('''
+            SELECT *
+            FROM api_link
+            WHERE id = :link_id
+        '''), {
+            'link_id': link_id
+        })
+        result = fetchall_as_dict(cursor)
+        return JsonResponse(result[0])
 
 
 def search(request):
