@@ -1,14 +1,15 @@
 from django.db import models
 from django.contrib.postgres.fields import ArrayField
+from django.contrib.auth.models import User
 
-
-class Link(models.Manager):
+class Link(models.Model):
     title = models.CharField(max_length=200, null=True)
-    keywords = ArrayField(models.CharField(max_length=200), null=True)
+    keywords = ArrayField(models.CharField(max_length=200), null=True, blank=True)
     url = models.URLField(max_length=200, null=True)
-    notes = models.TextField(null=True)
-    last_accessed = models.DateField(auto_now_add=True, null=True)
+    notes = models.TextField(null=True, blank=True)
+    last_accessed = models.DateField(auto_now_add=True, blank=True)
     views = models.PositiveIntegerField(default=0)
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
 
     class LinkTypes(models.TextChoices):
         PODCAST = 'PODCAST', 'Podcast'
