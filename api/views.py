@@ -14,6 +14,7 @@ class JsonResponse(HttpResponse):
     """
     An HttpResponse that renders its content into JSON.
     """
+
     def __init__(self, data, **kwargs):
         content = JSONRenderer().render(data)
         kwargs['content_type'] = 'application/json'
@@ -21,7 +22,7 @@ class JsonResponse(HttpResponse):
 
 
 def sql_text(text):
-    assert(connection.vendor == "postgresql")
+    assert (connection.vendor == "postgresql")
     statement = sql.text(text)
     result = str(statement.compile(dialect=postgresql.dialect()))
     return result
@@ -97,7 +98,6 @@ def search(request):
 def add_link(request):
     body = json.loads(request.body)
     notes, title, url, keywords = itemgetter('notes', 'title', 'url', 'keywords')(body)
-    print(notes, title)
 
     keywords = [] if '' else keywords.split(',')
 
@@ -117,9 +117,41 @@ def add_link(request):
             return JsonResponse(result[0])
 
 
+@csrf_exempt
 def delete_link(request):
-    return JsonResponse({})
+    body = json.loads(request.body)
+    link_id = body['id']
+    if request.method == 'POST':
+        with connection.cursor() as cursor:
+            cursor.execute(sql_text('''
+                DELETE FROM links
+                WHERE id = :id
+            '''), {
+                'id': link_id
+            })
+            result = fetchall_as_dict(cursor)
+            return JsonResponse(result[0])
 
 
+@csrf_exempt
 def update_link(request):
-    return JsonResponse({})
+    body = json.loads(request.body)
+    link_id, notes, title, url, keywords = itemgetter('id', 'notes', 'title', 'url', 'keywords')(body)
+
+    keywords = [] if '' else keywords.split(',')
+
+    if request.method == 'POST':
+        with connection.cursor() as cursor:
+            cursor.execute(sql_text('''
+                UPDATE links
+                SET keywords = :keywords, title = :title, url = :url, notes = :notes, last_accessed = NOW()
+                WHERE id = :id
+            '''), {
+                'id': link_id,
+                'notes': notes,
+                'title': title,
+                'url': url,
+                'keywords': keywords,
+            })
+            result = fetchall_as_dict(cursor)
+            return JsonResponse({'status': "success", id: id, 'message': "Link updated"})
