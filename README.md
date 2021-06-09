@@ -10,3 +10,7 @@ Quotes
 
 Started with this Tutorial
 * https://www.youtube.com/playlist?list=PL-51WBLyFTg2vW-_6XBoUpE7vpmoR3ztO
+
+### TODOs
+* [Django's Full Text Search](https://docs.djangoproject.com/en/3.2/ref/contrib/postgres/search/)
+* 
