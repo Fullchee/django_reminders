@@ -20,7 +20,6 @@ environ.Env.read_env()  # reading .env file
 SITE_ROOT = root()
 
 DEBUG = env.bool('DEBUG', default=False)
-print(env.db('DATABASE_URL'))
 
 DATABASES = {
     # read os.environ['DATABASE_URL'] and raises ImproperlyConfigured exception if not found
