@@ -48,7 +48,7 @@ def get_random_link(request):
             LIMIT 1
         '''))
         result = fetchall_as_dict(cursor)
-        return JsonResponse(result)
+        return JsonResponse(result[0])
 
 
 def get_all_links(request):
