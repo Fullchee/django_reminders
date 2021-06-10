@@ -11,7 +11,6 @@ https://docs.djangoproject.com/en/3.2/ref/settings/
 """
 import os
 from pathlib import Path
-from decouple import config
 import environ
 
 root = environ.Path(__file__) - 3  # get root of the project
