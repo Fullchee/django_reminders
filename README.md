@@ -7,6 +7,7 @@ Previous API
 * https://github.com/Fullchee/reminders-backend/blob/master/src/index.js
 
 ### TODOs
+* https://medium.com/@dakota.lillie/django-react-jwt-authentication-5015ee00ef9a
 * Use ORM queries
 * add auth & login to reminders
 * [Django's Full Text Search](https://docs.djangoproject.com/en/3.2/ref/contrib/postgres/search/)
