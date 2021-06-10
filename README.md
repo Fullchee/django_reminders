@@ -7,6 +7,8 @@ Previous API
 * https://github.com/Fullchee/reminders-backend/blob/master/src/index.js
 
 ### TODOs
+* Use ORM queries
+* add auth & login to reminders
 * [Django's Full Text Search](https://docs.djangoproject.com/en/3.2/ref/contrib/postgres/search/)
 * Kevin Powell's neon button instead of my green button
 * insertion/edit: handle the case when a link already exists

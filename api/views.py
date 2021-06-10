@@ -8,6 +8,7 @@ import psycopg2.sql
 import json
 from operator import itemgetter
 from django.views.decorators.csrf import csrf_exempt
+from .models import Link
 
 
 class JsonResponse(HttpResponse):
@@ -85,7 +86,7 @@ def search(request):
     with connection.cursor() as cursor:
         cursor.execute(sql_text('''
             SELECT * 
-            FROM links
+            FROM api_link
             WHERE (title LIKE '%' || :query || '%' OR notes LIKE '%' || :query || '%')
         '''), {
             'query': request.GET.get('q', '')
@@ -96,16 +97,17 @@ def search(request):
 
 @csrf_exempt
 def add_link(request):
+    # request.user.id
     body = json.loads(request.body)
     notes, title, url, keywords = itemgetter('notes', 'title', 'url', 'keywords')(body)
 
-    keywords = [] if '' else keywords.split(',')
+    keywords = [] if keywords == '' else keywords.split(',')
 
     if request.method == 'POST':
         with connection.cursor() as cursor:
             cursor.execute(sql_text('''
-                INSERT INTO links (notes, title, url, keywords, last_accessed)
-                VALUES (:notes, :title, :url, :keywords, NOW())
+                INSERT INTO api_link (id, notes, title, url, keywords, last_accessed)
+                VALUES (nextval('api_link_id_seq'::regclass), :notes, :title, :url, :keywords, NOW())
                 RETURNING id
             '''), {
                 'notes': notes,
@@ -124,7 +126,7 @@ def delete_link(request):
     if request.method == 'POST':
         with connection.cursor() as cursor:
             cursor.execute(sql_text('''
-                DELETE FROM links
+                DELETE FROM api_link
                 WHERE id = :id
             '''), {
                 'id': link_id
@@ -138,12 +140,12 @@ def update_link(request):
     body = json.loads(request.body)
     link_id, notes, title, url, keywords = itemgetter('id', 'notes', 'title', 'url', 'keywords')(body)
 
-    keywords = [] if '' else keywords.split(',')
+    keywords = [] if keywords == '' else keywords.split(',')
 
     if request.method == 'POST':
         with connection.cursor() as cursor:
             cursor.execute(sql_text('''
-                UPDATE links
+                UPDATE api_link
                 SET keywords = :keywords, title = :title, url = :url, notes = :notes, last_accessed = NOW()
                 WHERE id = :id
             '''), {
