@@ -4,19 +4,15 @@ from django.db import connection
 from rest_framework.renderers import JSONRenderer
 import sqlalchemy as sql
 from sqlalchemy.dialects import postgresql
-import psycopg2.sql
 import json
 from operator import itemgetter
 from django.views.decorators.csrf import csrf_exempt
-from .models import Link
 
-from django.http import HttpResponseRedirect
-from django.contrib.auth.models import User
 from rest_framework import permissions, status
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
 from rest_framework.views import APIView
-from .serializers import UserSerializer, UserSerializerWithToken
+from core.serializers import UserSerializer, UserSerializerWithToken
 
 
 @api_view(['GET'])
