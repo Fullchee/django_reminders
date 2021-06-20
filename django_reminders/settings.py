@@ -59,6 +59,7 @@ INSTALLED_APPS = [
     'api',
     'rest_framework',
     'corsheaders',
+    'core.apps.CoreConfig',
 ]
 
 MIDDLEWARE = [
@@ -145,3 +146,7 @@ CORS_ORIGIN_WHITELIST = (
     'http://localhost:3000',
     'https://fullchee-reminders.netlify.app',
 )
+
+JWT_AUTH = {
+    'JWT_RESPONSE_PAYLOAD_HANDLER': 'api.utils.my_jwt_response_handler'
+}

@@ -1,3 +1,5 @@
+### User Auth
+https://medium.com/@dakota.lillie/django-react-jwt-authentication-5015ee00ef9a
 
 ### .env
 In `django_reminders/.env` (not the root)

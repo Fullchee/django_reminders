@@ -4,6 +4,8 @@ from rest_framework_jwt.views import obtain_jwt_token
 
 urlpatterns = [
     path('', views.ping),
+    path('current_user/', views.current_user),
+    path('users/', views.UserList.as_view()),
     path('token-auth/', obtain_jwt_token),
     path('links', views.get_all_links),
     path('random-link', views.get_random_link),
