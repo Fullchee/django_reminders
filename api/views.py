@@ -1,18 +1,21 @@
-from django.shortcuts import render
-from django.http import HttpResponse
-from django.db import connection
-from rest_framework.renderers import JSONRenderer
-import sqlalchemy as sql
-from sqlalchemy.dialects import postgresql
 import json
-from operator import itemgetter
-from django.views.decorators.csrf import csrf_exempt
+import sqlalchemy as sql
 
+from django.core.serializers import serialize
+from django.db import connection
+from django.http import HttpResponse
+from django.shortcuts import render
+from django.views.decorators.csrf import csrf_exempt
+from operator import itemgetter
 from rest_framework import permissions, status
 from rest_framework.decorators import api_view
+from rest_framework.renderers import JSONRenderer
 from rest_framework.response import Response
 from rest_framework.views import APIView
-from core.serializers import UserSerializer, UserSerializerWithToken
+from sqlalchemy.dialects import postgresql
+
+from .models import Link
+from api.serializers import UserSerializer, UserSerializerWithToken
 
 
 @api_view(['GET'])
@@ -71,6 +74,12 @@ def ping(request):
     return render(request, 'api/PingTemplate.html')
 
 
+@api_view(['GET'])
+def get_all_links(request):
+    links = list(Link.objects.filter(user=request.user))
+    return HttpResponse(serialize('json', links), content_type='application/json')
+
+
 def get_random_link(request):
     with connection.cursor() as cursor:
         cursor.execute(sql_text('''
@@ -80,13 +89,6 @@ def get_random_link(request):
         '''))
         result = fetchall_as_dict(cursor)
         return JsonResponse(result[0])
-
-
-def get_all_links(request):
-    with connection.cursor() as cursor:
-        cursor.execute(sql_text('''SELECT * FROM api_link'''))
-        result = fetchall_as_dict(cursor)
-        return JsonResponse(result)
 
 
 def get_keywords(request):
