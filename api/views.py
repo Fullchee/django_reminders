@@ -23,7 +23,7 @@ def current_user(request):
     """
     Determine the current user by their token, and return their data
     """
-    
+
     serializer = UserSerializer(request.user)
     return Response(serializer.data)
 
@@ -190,7 +190,7 @@ def update_link(request):
         with connection.cursor() as cursor:
             cursor.execute(sql_text('''
                 UPDATE api_link
-                SET keywords = :keywords, title = :title, url = :url, notes = :notes, last_accessed = NOW()
+                SET keywords = :keywords, title = :title, url = :url, notes = :notes, last_accessed = NOW(), views = views + 1
                 WHERE id = :id
             '''), {
                 'id': link_id,
