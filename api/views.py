@@ -143,8 +143,6 @@ def add_link(request):
     body = json.loads(request.body)
     notes, title, url, keywords = itemgetter('notes', 'title', 'url', 'keywords')(body)
 
-    keywords = [] if keywords == '' else keywords.split(',')
-
     if request.method == 'POST':
         with connection.cursor() as cursor:
             cursor.execute(sql_text('''
@@ -184,8 +182,7 @@ def update_link(request):
     body = json.loads(request.body)
     link_id, notes, title, url, keywords = itemgetter('id', 'notes', 'title', 'url', 'keywords')(body)
 
-    keywords = [] if keywords == '' else keywords.split(',')
-
+    keywords = list(map(lambda keyword: keyword['value'], keywords))
     if request.method == 'POST':
         with connection.cursor() as cursor:
             cursor.execute(sql_text('''
