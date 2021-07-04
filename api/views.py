@@ -179,10 +179,13 @@ def delete_link(request):
 @csrf_exempt
 # @api_view(['POST', 'PUT'])
 def update_link(request):
+    print('Got request')
     body = json.loads(request.body)
     link_id, notes, title, url, keywords = itemgetter('id', 'notes', 'title', 'url', 'keywords')(body)
 
+    print(f'Got link_id: {link_id}. About to make the request')
     keywords = list(map(lambda keyword: keyword['value'], keywords))
+    print(f'Got keywords: {keywords}')
     if request.method == 'POST':
         with connection.cursor() as cursor:
             cursor.execute(sql_text('''
