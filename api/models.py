@@ -5,6 +5,7 @@ from django.forms import ModelForm
 
 
 class Link(models.Model):
+    id = models.BigAutoField(primary_key=True, null=False)
     title = models.CharField(max_length=200, null=True)
     keywords = ArrayField(models.CharField(max_length=200), null=True, blank=True)
     url = models.URLField(max_length=200, null=True)
