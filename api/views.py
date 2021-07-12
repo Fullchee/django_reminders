@@ -128,7 +128,13 @@ def search(request):
         cursor.execute(sql_text('''
             SELECT * 
             FROM api_link
-            WHERE (title LIKE '%' || :query || '%' OR notes LIKE '%' || :query || '%')
+            WHERE (
+              title ILIKE '%' || :query || '%'
+              OR
+              notes ILIKE '%' || :query || '%'
+              OR
+              :query = ANY(keywords)
+              )
         '''), {
             'query': request.GET.get('q', '')
         })
