@@ -8,7 +8,7 @@ class Link(models.Model):
     id = models.BigAutoField(primary_key=True, null=False)
     title = models.CharField(max_length=200, null=True)
     keywords = ArrayField(models.CharField(max_length=200), null=True, blank=True)
-    url = models.URLField(max_length=200, null=True)
+    url = models.URLField(max_length=200, null=True, unique=True)
     notes = models.TextField(null=True, blank=True)
     last_accessed = models.DateField(auto_now_add=True, blank=True)
     views = models.PositiveIntegerField(default=0)

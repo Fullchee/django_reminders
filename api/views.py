@@ -187,7 +187,16 @@ def update_link(request):
         with connection.cursor() as cursor:
             cursor.execute(sql_text('''
                 UPDATE api_link
-                SET keywords = :keywords, title = :title, url = :url, notes = :notes, last_accessed = NOW(), views = views + 1
+                SET keywords = :keywords,
+                  title = :title,
+                  url = :url,
+                  notes = :notes,
+                  last_accessed = NOW(),
+                  views =
+                    CASE last_accessed = CURRENT_DATE
+                      WHEN TRUE THEN views
+                      WHEN FALSE THEN views + 1
+                    END
                 WHERE id = :id
             '''), {
                 'id': link_id,
