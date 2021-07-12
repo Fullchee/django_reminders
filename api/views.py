@@ -199,6 +199,7 @@ def update_link(request):
                       WHEN FALSE THEN views + 1
                     END
                 WHERE id = :id
+                RETURNING *
             '''), {
                 'id': link_id,
                 'notes': notes,
@@ -206,4 +207,5 @@ def update_link(request):
                 'url': url,
                 'keywords': keywords,
             })
-            return JsonResponse({'status': "success", 'id': link_id, 'message': "Link updated"})
+            result = fetchall_as_dict(cursor)
+            return JsonResponse(result[0])
