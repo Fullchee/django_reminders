@@ -148,7 +148,8 @@ def add_link(request):
             cursor.execute(sql_text('''
                 INSERT INTO api_link (id, notes, title, url, keywords, last_accessed, user_id)
                 VALUES (nextval('api_link_id_seq'::regclass), :notes, :title, :url, :keywords, NOW(), 2)
-                RETURNING id
+                ON CONFLICT (url) DO UPDATE SET url = :url
+                RETURNING *
             '''), {
                 'notes': notes,
                 'title': title,
