@@ -22,3 +22,11 @@ Previous API
 * [Quotes](https://docs.google.com/document/d/1Jyacu6CO1NjgtO17r9vORFg3yML1td2NTnNnBCPLTEc/edit#bookmark=id.s5flor9nxcny)
 * [Pearls Before Swine](https://drive.google.com/drive/u/0/folders/0BzXAmMBrEg0MTUpiNG0wMk1BazQ)
 * update the random-link algo so that it gets links that are further in the past
+* Link together different links
+   * when updating/adding a link, check the notes
+   * delete all the previous links and add all the new links
+   * syntax: link-78
+* Keywords: what moments in time am I danger of going into the storm?
+   * work shame
+   * shame (non work)
+   * lower expectations
