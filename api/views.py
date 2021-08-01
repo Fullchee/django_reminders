@@ -51,12 +51,12 @@ class JsonResponse(HttpResponse):
 
     def __init__(self, data, **kwargs):
         content = JSONRenderer().render(data)
-        kwargs['content_type'] = 'application/json'
+        kwargs["content_type"] = "application/json"
         super().__init__(content, **kwargs)
 
 
 def sql_text(text):
-    assert (connection.vendor == "postgresql")
+    assert connection.vendor == "postgresql"
     statement = sql.text(text)
     result = str(statement.compile(dialect=postgresql.dialect()))
     return result
@@ -64,15 +64,12 @@ def sql_text(text):
 
 def fetchall_as_dict(cursor):
     columns = [col[0] for col in cursor.description]
-    return [
-        dict(zip(columns, row))
-        for row in cursor.fetchall()
-    ]
+    return [dict(zip(columns, row)) for row in cursor.fetchall()]
 
 
 # @api_view(['GET'])
 def ping(request):
-    return render(request, 'api/PingTemplate.html')
+    return render(request, "api/PingTemplate.html")
 
 
 # @api_view(['GET'])
@@ -80,7 +77,7 @@ def get_all_links(request):
     # links = list(Link.objects.filter(user=request.user))
     # return HttpResponse(serialize('json', links), content_type='application/json')
     with connection.cursor() as cursor:
-        cursor.execute(sql_text('''SELECT * FROM api_link'''))
+        cursor.execute(sql_text("""SELECT * FROM api_link"""))
         result = fetchall_as_dict(cursor)
         return JsonResponse(result)
 
@@ -88,11 +85,15 @@ def get_all_links(request):
 # @api_view(['GET'])
 def get_random_link(request):
     with connection.cursor() as cursor:
-        cursor.execute(sql_text('''
+        cursor.execute(
+            sql_text(
+                """
             SELECT * FROM api_link
             ORDER BY RANDOM()
             LIMIT 1
-        '''))
+        """
+            )
+        )
         result = fetchall_as_dict(cursor)
         return JsonResponse(result[0])
 
@@ -100,24 +101,31 @@ def get_random_link(request):
 # @api_view(['GET'])
 def get_keywords(request):
     with connection.cursor() as cursor:
-        cursor.execute(sql_text('''
+        cursor.execute(
+            sql_text(
+                """
             SELECT DISTINCT UNNEST(keywords) AS keyword
             FROM api_link
-        '''))
+        """
+            )
+        )
         result = fetchall_as_dict(cursor)
-        return JsonResponse(sorted(map(lambda obj: obj['keyword'], result)))
+        return JsonResponse(sorted(map(lambda obj: obj["keyword"], result)))
 
 
 # @api_view(['GET'])
 def get_link(request, link_id):
     with connection.cursor() as cursor:
-        cursor.execute(sql_text('''
+        cursor.execute(
+            sql_text(
+                """
             SELECT *
             FROM api_link
             WHERE id = :link_id
-        '''), {
-            'link_id': link_id
-        })
+        """
+            ),
+            {"link_id": link_id},
+        )
         result = fetchall_as_dict(cursor)
         return JsonResponse(result[0])
 
@@ -125,7 +133,9 @@ def get_link(request, link_id):
 # @api_view(['GET'])
 def search(request):
     with connection.cursor() as cursor:
-        cursor.execute(sql_text('''
+        cursor.execute(
+            sql_text(
+                """
             SELECT * 
             FROM api_link
             WHERE (
@@ -135,9 +145,10 @@ def search(request):
               OR
               :query = ANY(keywords)
               )
-        '''), {
-            'query': request.GET.get('q', '')
-        })
+        """
+            ),
+            {"query": request.GET.get("q", "")},
+        )
         result = fetchall_as_dict(cursor)
         return JsonResponse(result)
 
@@ -147,21 +158,26 @@ def search(request):
 def add_link(request):
     # request.user.id
     body = json.loads(request.body)
-    notes, title, url, keywords = itemgetter('notes', 'title', 'url', 'keywords')(body)
+    notes, title, url, keywords = itemgetter("notes", "title", "url", "keywords")(body)
 
-    if request.method == 'POST':
+    if request.method == "POST":
         with connection.cursor() as cursor:
-            cursor.execute(sql_text('''
-                INSERT INTO api_link (id, notes, title, url, keywords, last_accessed, user_id)
-                VALUES (nextval('api_link_id_seq'::regclass), :notes, :title, :url, :keywords, NOW(), 2)
+            cursor.execute(
+                sql_text(
+                    """
+                INSERT INTO api_link (id, notes, title, url, keywords, last_accessed, user_id, flag)
+                VALUES (nextval('api_link_id_seq'::regclass), :notes, :title, :url, :keywords, NOW(), 2, FALSE)
                 ON CONFLICT (url) DO UPDATE SET url = :url
                 RETURNING *
-            '''), {
-                'notes': notes,
-                'title': title,
-                'url': url,
-                'keywords': keywords,
-            })
+                """
+                ),
+                {
+                    "notes": notes,
+                    "title": title,
+                    "url": url,
+                    "keywords": keywords,
+                },
+            )
             result = fetchall_as_dict(cursor)
             return JsonResponse(result[0])
 
@@ -170,15 +186,18 @@ def add_link(request):
 # @api_view(['POST', 'PUT'])
 def delete_link(request):
     body = json.loads(request.body)
-    link_id = body['id']
+    link_id = body["id"]
     with connection.cursor() as cursor:
-        cursor.execute(sql_text('''
+        cursor.execute(
+            sql_text(
+                """
             DELETE FROM api_link
             WHERE id = :id
             RETURNING :id as id
-        '''), {
-            'id': link_id
-        })
+        """
+            ),
+            {"id": link_id},
+        )
         result = fetchall_as_dict(cursor)
         return JsonResponse(result[0])
 
@@ -187,17 +206,22 @@ def delete_link(request):
 # @api_view(['POST', 'PUT'])
 def update_link(request):
     body = json.loads(request.body)
-    link_id, notes, title, url, keywords = itemgetter('id', 'notes', 'title', 'url', 'keywords')(body)
+    link_id, notes, title, url, keywords, flag = itemgetter(
+        "id", "notes", "title", "url", "keywords", "flag"
+    )(body)
 
-    keywords = list(map(lambda keyword: keyword['value'], keywords))
-    if request.method == 'POST':
+    keywords = list(map(lambda keyword: keyword["value"], keywords))
+    if request.method == "POST":
         with connection.cursor() as cursor:
-            cursor.execute(sql_text('''
+            cursor.execute(
+                sql_text(
+                    """
                 UPDATE api_link
                 SET keywords = :keywords,
                   title = :title,
                   url = :url,
                   notes = :notes,
+                  flag = :flag,
                   last_accessed = NOW(),
                   views =
                     CASE last_accessed = CURRENT_DATE
@@ -206,12 +230,16 @@ def update_link(request):
                     END
                 WHERE id = :id
                 RETURNING *
-            '''), {
-                'id': link_id,
-                'notes': notes,
-                'title': title,
-                'url': url,
-                'keywords': keywords,
-            })
+            """
+                ),
+                {
+                    "id": link_id,
+                    "notes": notes,
+                    "title": title,
+                    "url": url,
+                    "keywords": keywords,
+                    'flag': flag,
+                },
+            )
             result = fetchall_as_dict(cursor)
             return JsonResponse(result[0])
