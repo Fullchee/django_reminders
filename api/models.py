@@ -13,6 +13,7 @@ class Link(models.Model):
     last_accessed = models.DateField(auto_now_add=True, blank=True)
     views = models.PositiveIntegerField(default=0)
     user = models.ForeignKey(User, on_delete=models.CASCADE)
+    flag = models.BooleanField()
 
     class LinkTypes(models.TextChoices):
         PODCAST = 'PODCAST', 'Podcast'
