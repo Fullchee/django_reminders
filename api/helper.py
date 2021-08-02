@@ -12,7 +12,7 @@ def get_youtube_id(link: str):
     )
     google_mobile_match = search(
         "m.youtube.com/watch%3Fv%3D([a-zA-Z0-9-_]{11})&sa",
-        'https://www.google.com/url?q=https://m.youtube.com/watch%3Fv%3DDME1vicSb1M&sa=U&ved=2ahUKEwj16IOFipPyAhVUVc0KHUTmDS8QtwIwAXoECGMQAQ&usg=AOvVaw1HRSqGljWzAmoELBbLHDdm'
+        link,
     )
 
     try:
