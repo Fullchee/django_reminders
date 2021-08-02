@@ -160,6 +160,8 @@ def add_link(request):
     body = json.loads(request.body)
     notes, title, url, keywords = itemgetter("notes", "title", "url", "keywords")(body)
 
+    keywords = list(map(lambda keyword: keyword["value"], keywords))
+
     if request.method == "POST":
         with connection.cursor() as cursor:
             cursor.execute(
