@@ -17,7 +17,7 @@ from sqlalchemy.dialects import postgresql
 from .models import Link
 from api.serializers import UserSerializer, UserSerializerWithToken
 
-from .helper import parse_keywords, shorten_youtube_link
+from .helper import parse_keywords, shorten_youtube_url, generate_youtube_title
 
 
 # @api_view(['GET'])
@@ -163,7 +163,8 @@ def add_link(request):
     notes, title, url, keywords = itemgetter("notes", "title", "url", "keywords")(body)
 
     keywords = parse_keywords(keywords)
-    url = shorten_youtube_link(url)
+    url = shorten_youtube_url(url)
+    title = title or generate_youtube_title(url)
 
     if request.method == "POST":
         with connection.cursor() as cursor:
@@ -216,7 +217,7 @@ def update_link(request):
     )(body)
 
     keywords = parse_keywords(keywords)
-    url = shorten_youtube_link(url)
+    url = shorten_youtube_url(url)
 
     if request.method == "POST":
         with connection.cursor() as cursor:
