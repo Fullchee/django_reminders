@@ -218,6 +218,7 @@ def update_link(request):
 
     keywords = parse_keywords(keywords)
     url = shorten_youtube_url(url)
+    title = title or generate_youtube_title(url)
 
     if request.method == "POST":
         with connection.cursor() as cursor:
