@@ -1,9 +1,7 @@
-from re import search
-
-import urllib.request
 import json
 import urllib
-import pprint
+import urllib.request
+from re import search
 
 
 def parse_keywords(keywords):
@@ -11,6 +9,10 @@ def parse_keywords(keywords):
 
 
 def get_youtube_id(url: str) -> str:
+    """
+    :param url: potentially encoded or shortened YouTube URL
+    :return: the YouTube video ID
+    """
     desktop_match = search(
         "youtube\.com/watch\?v=([a-zA-Z0-9-_]{11})",
         url,
@@ -20,8 +22,12 @@ def get_youtube_id(url: str) -> str:
         "https://youtu.be/([a-zA-Z0-9-_]{11})",
         url,
     )
-    encoded_match = search(
-        "youtube.com/watch%3Fv%3D([a-zA-Z0-9-_]{11})&sa",
+    firefox_android_mobile_match = search(
+        "m.youtube.com/watch%3Fv%3D([a-zA-Z0-9-_]{11})&",
+        url,
+    )
+    firefox_android_desktop_match = search(
+        "youtube.com%2Fwatch%3Fv%3D([a-zA-Z0-9-_]{11})",
         url,
     )
 
@@ -29,12 +35,15 @@ def get_youtube_id(url: str) -> str:
         return desktop_match.groups()[0]
     except Exception:
         try:
-            return encoded_match.groups()[0]
+            return firefox_android_mobile_match.groups()[0]
         except Exception:
             try:
                 return shortened_youtube_match.groups()[0]
             except Exception:
-                return ""
+                try:
+                    return firefox_android_desktop_match.groups()[0]
+                except Exception:
+                    return ""
 
 
 def get_youtube_time(url: str) -> str:
