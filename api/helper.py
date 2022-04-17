@@ -20,8 +20,8 @@ def get_youtube_id(url: str) -> str:
         "https://youtu.be/([a-zA-Z0-9-_]{11})",
         url,
     )
-    google_mobile_match = search(
-        "m.youtube.com/watch%3Fv%3D([a-zA-Z0-9-_]{11})&sa",
+    encoded_match = search(
+        "youtube.com/watch%3Fv%3D([a-zA-Z0-9-_]{11})&sa",
         url,
     )
 
@@ -29,7 +29,7 @@ def get_youtube_id(url: str) -> str:
         return desktop_match.groups()[0]
     except Exception:
         try:
-            return google_mobile_match.groups()[0]
+            return encoded_match.groups()[0]
         except Exception:
             try:
                 return shortened_youtube_match.groups()[0]
