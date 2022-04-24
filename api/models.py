@@ -11,9 +11,12 @@ class Link(models.Model):
     url = models.URLField(max_length=1000, null=True, unique=True)
     notes = models.TextField(null=True, blank=True)
     last_accessed = models.DateField(auto_now_add=True, blank=True)
-    views = models.PositiveIntegerField(default=0)
+    views = models.PositiveIntegerField(default=0)  # view count
     user = models.ForeignKey(User, on_delete=models.CASCADE)
-    flag = models.BooleanField()
+    flag = models.BooleanField(default=False)
+
+    # will override the `t` query param in the URL for YouTube videos
+    start_time_in_sec = models.PositiveIntegerField(default=0)
 
     class LinkTypes(models.TextChoices):
         PODCAST = 'PODCAST', 'Podcast'
