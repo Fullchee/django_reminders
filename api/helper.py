@@ -2,6 +2,7 @@ import json
 import urllib
 import urllib.request
 from re import search
+from typing import Tuple, Optional
 
 
 def parse_keywords(keywords):
@@ -46,29 +47,34 @@ def get_youtube_id(url: str) -> str:
                     return ""
 
 
-def get_youtube_time(url: str) -> str:
+def get_youtube_time(url: str) -> int:
     time_match = search(
-        "(\?t=\d+)$",
+        "\?t=(\d+)$",
         url,
     )
     try:
-        return time_match.groups()[0]
+        return int(time_match.groups()[0])
     except Exception:
-        return ""
+        return 0
 
 
-def shorten_youtube_url(url: str) -> str:
+def extract_youtube_info(url: str) -> Tuple[str, Optional[int]]:
+    """
+    :param url: URL
+    :return: (short YouTube URL, youtube start time)
+             if not a YouTube URL, return (url, None)
+    """
     youtube_id = get_youtube_id(url)
     if youtube_id:
-        return f"https://youtu.be/{youtube_id}{get_youtube_time(url)}"
-    return url
+        return f"https://youtu.be/{youtube_id}", get_youtube_time(url)
+    return url, None
 
 
 def generate_youtube_title(url: str) -> str:
     """
     https://stackoverflow.com/a/52664178/8479344
-    :param url: str
-    :return: str - author name: video title
+    :param url: YouTube URL
+    :return: str - f"{author name}: {video title}"
     """
     youtube_id = get_youtube_id(url)
     if not youtube_id:

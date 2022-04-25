@@ -17,7 +17,7 @@ from sqlalchemy.dialects import postgresql
 from .models import Link
 from api.serializers import UserSerializer, UserSerializerWithToken
 
-from .helper import parse_keywords, shorten_youtube_url, generate_youtube_title
+from .helper import parse_keywords, extract_youtube_info, generate_youtube_title
 
 
 # @api_view(['GET'])
@@ -128,8 +128,11 @@ def get_link(request, link_id):
             ),
             {"link_id": link_id},
         )
-        result = fetchall_as_dict(cursor)
-        return JsonResponse(result[0])
+        result = fetchall_as_dict(cursor)[0]
+        if "youtu.be" in result["url"]:
+            result["url"] += f"?t={result['start_time'] or 0}"
+        result["startTime"] = result["start_time"]
+        return JsonResponse(result)
 
 
 # @api_view(['GET'])
@@ -155,42 +158,99 @@ def search(request):
         return JsonResponse(result)
 
 
+def add_or_update(request, action: str) -> HttpResponse:
+    """
+    :param request:
+    :param action: 'add' or 'update'
+    """
+    # TODO: auth with request.user.id
+
+    # temp measure, the @api_view decorator will do this in the future
+    if request.method != "POST" and request.method != "PUT":
+        return HttpResponse(status=405)
+
+    INSERT_QUERY = """
+        INSERT INTO api_link (id, notes, title, url, keywords, last_accessed, user_id, flag, start_time)
+        VALUES (nextval('api_link_id_seq'::regclass), :notes, :title, :url, :keywords, NOW(), 2, FALSE, :start_time)
+        ON CONFLICT (url) DO UPDATE SET url = :url
+        RETURNING *
+    """
+
+    UPDATE_QUERY = """
+        UPDATE api_link
+        SET keywords = :keywords,
+          title = :title,
+          url = :url,
+          notes = :notes,
+          flag = :flag,
+          last_accessed = NOW(),
+          start_time = :start_time,
+          views =
+            CASE last_accessed = CURRENT_DATE
+              WHEN TRUE THEN views
+              WHEN FALSE THEN views + 1
+            END
+        WHERE id = :id
+        RETURNING *
+    """
+
+    query = UPDATE_QUERY if action == "update" else INSERT_QUERY
+    body = json.loads(request.body)
+    notes, title, url, keywords = itemgetter(
+        "notes",
+        "title",
+        "url",
+        "keywords",
+    )(body)
+
+    link_id = flag = start_time = None
+    if action == "update":
+        link_id, flag, start_time = itemgetter("id", "flag", "start_time")(body)
+
+    keywords = parse_keywords(keywords)
+    url, youtube_start_time = extract_youtube_info(url)
+    title = title or generate_youtube_title(url)
+
+    # prioritize the form start time over the YouTube URL (which might be outdated)
+    start_time = (start_time and int(start_time)) or youtube_start_time or 0
+
+    with connection.cursor() as cursor:
+        cursor.execute(
+            sql_text(query),
+            {
+                "id": link_id,
+                "notes": notes,
+                "title": title,
+                "url": url,
+                "keywords": keywords,
+                "flag": flag,
+                "start_time": start_time,
+            },
+        )
+        result = fetchall_as_dict(cursor)[0]
+        if "youtu.be" in result["url"]:
+            result["url"] += f"?t={result['start_time'] or 0}"
+        result["startTime"] = result["start_time"]
+        return JsonResponse(result)
+
+
 @csrf_exempt
 # @api_view(['POST', 'PUT'])
 def add_link(request):
-    # request.user.id
-    body = json.loads(request.body)
-    notes, title, url, keywords = itemgetter("notes", "title", "url", "keywords")(body)
-
-    keywords = parse_keywords(keywords)
-    url = shorten_youtube_url(url)
-    title = title or generate_youtube_title(url)
-
-    if request.method == "POST":
-        with connection.cursor() as cursor:
-            cursor.execute(
-                sql_text(
-                    """
-                INSERT INTO api_link (id, notes, title, url, keywords, last_accessed, user_id, flag)
-                VALUES (nextval('api_link_id_seq'::regclass), :notes, :title, :url, :keywords, NOW(), 2, FALSE)
-                ON CONFLICT (url) DO UPDATE SET url = :url
-                RETURNING *
-                """
-                ),
-                {
-                    "notes": notes,
-                    "title": title,
-                    "url": url,
-                    "keywords": keywords,
-                },
-            )
-            result = fetchall_as_dict(cursor)
-            return JsonResponse(result[0])
+    return add_or_update(request, "add")
 
 
 @csrf_exempt
 # @api_view(['POST', 'PUT'])
-def delete_link(request):
+def update_link(request) -> HttpResponse:
+    return add_or_update(request, "update")
+
+
+@csrf_exempt
+# @api_view(['POST', 'PUT'])
+def delete_link(request) -> HttpResponse:
+    if request.method != "POST" and request.method != "PUT":
+        return HttpResponse(status=405)
     body = json.loads(request.body)
     link_id = body["id"]
     with connection.cursor() as cursor:
@@ -206,49 +266,3 @@ def delete_link(request):
         )
         result = fetchall_as_dict(cursor)
         return JsonResponse(result[0])
-
-
-@csrf_exempt
-# @api_view(['POST', 'PUT'])
-def update_link(request):
-    body = json.loads(request.body)
-    link_id, notes, title, url, keywords, flag = itemgetter(
-        "id", "notes", "title", "url", "keywords", "flag"
-    )(body)
-
-    keywords = parse_keywords(keywords)
-    url = shorten_youtube_url(url)
-    title = title or generate_youtube_title(url)
-
-    if request.method == "POST":
-        with connection.cursor() as cursor:
-            cursor.execute(
-                sql_text(
-                    """
-                UPDATE api_link
-                SET keywords = :keywords,
-                  title = :title,
-                  url = :url,
-                  notes = :notes,
-                  flag = :flag,
-                  last_accessed = NOW(),
-                  views =
-                    CASE last_accessed = CURRENT_DATE
-                      WHEN TRUE THEN views
-                      WHEN FALSE THEN views + 1
-                    END
-                WHERE id = :id
-                RETURNING *
-            """
-                ),
-                {
-                    "id": link_id,
-                    "notes": notes,
-                    "title": title,
-                    "url": url,
-                    "keywords": keywords,
-                    "flag": flag,
-                },
-            )
-            result = fetchall_as_dict(cursor)
-            return JsonResponse(result[0])

@@ -15,8 +15,9 @@ class Link(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     flag = models.BooleanField(default=False)
 
+    # in seconds
     # will override the `t` query param in the URL for YouTube videos
-    start_time_in_sec = models.PositiveIntegerField(default=0)
+    start_time = models.PositiveIntegerField(default=0)
 
     class LinkTypes(models.TextChoices):
         PODCAST = 'PODCAST', 'Podcast'
