@@ -16,12 +16,21 @@
 * virtual-env
 * Postgres 13.2+
 
-1. Setup your virtual environment and enter it
+
+1. Setup your virtual environment and enter
 2. `python install -r ./requirements.txt`
 3. `python manage.py migrate`
 4. Start the Django app with the environment variables
 
+
+When adding a new dependency run this to update requirements.txt
+
+```bash
+pipenv lock --requirements > requirements.txt
 ```
+
+
+```sh
 PYTHONUNBUFFERED=1;
 DJANGO_SETTINGS_MODULE=django_reminders.settings
 ```
