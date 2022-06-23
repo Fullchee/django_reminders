@@ -4,6 +4,10 @@ import urllib.request
 from re import search
 from typing import Tuple, Optional
 
+import logging
+
+logger = logging.getLogger(__name__)
+
 
 def parse_keywords(keywords):
     return list(map(lambda keyword: keyword["value"], keywords))
@@ -14,11 +18,22 @@ def get_youtube_id(url: str) -> str:
     :param url: potentially encoded or shortened YouTube URL
     :return: the YouTube video ID
     """
+
+    matches = get_youtube_url_matches(url)
+
+    for match in matches:
+        try:
+            return match.groups()[0]
+        except Exception as e:
+            logger.debug(f"Match failed: {e}")
+    return ""
+
+
+def get_youtube_url_matches(url: str):
     desktop_match = search(
         "youtube\.com/watch\?v=([a-zA-Z0-9-_]{11})",
         url,
     )
-
     shortened_youtube_match = search(
         "https://youtu.be/([a-zA-Z0-9-_]{11})",
         url,
@@ -31,21 +46,12 @@ def get_youtube_id(url: str) -> str:
         "youtube.com%2Fwatch%3Fv%3D([a-zA-Z0-9-_]{11})",
         url,
     )
-
-    try:
-        return desktop_match.groups()[0]
-    except Exception:
-        try:
-            return firefox_android_mobile_match.groups()[0]
-        except Exception:
-            try:
-                return shortened_youtube_match.groups()[0]
-            except Exception:
-                try:
-                    return firefox_android_desktop_match.groups()[0]
-                except Exception:
-                    return ""
-
+    return [
+        desktop_match,
+        shortened_youtube_match,
+        firefox_android_mobile_match,
+        firefox_android_desktop_match,
+    ]
 
 def get_youtube_time(url: str) -> int:
     time_match = search(
