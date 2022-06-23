@@ -158,43 +158,12 @@ def search(request):
         return JsonResponse(result)
 
 
-def add_or_update(request, action: str) -> HttpResponse:
+def add_or_update(request, action: str, query: str) -> HttpResponse:
     """
     :param request:
     :param action: 'add' or 'update'
+    :param query: insert or update query
     """
-    # TODO: auth with request.user.id
-
-    # temp measure, the @api_view decorator will do this in the future
-    if request.method != "POST" and request.method != "PUT":
-        return HttpResponse(status=405)
-
-    INSERT_QUERY = """
-        INSERT INTO api_link (id, notes, title, url, keywords, last_accessed, user_id, flag, start_time)
-        VALUES (nextval('api_link_id_seq'::regclass), :notes, :title, :url, :keywords, NOW(), 2, FALSE, :start_time)
-        ON CONFLICT (url) DO UPDATE SET url = :url
-        RETURNING *
-    """
-
-    UPDATE_QUERY = """
-        UPDATE api_link
-        SET keywords = :keywords,
-          title = :title,
-          url = :url,
-          notes = :notes,
-          flag = :flag,
-          last_accessed = NOW(),
-          start_time = :start_time,
-          views =
-            CASE last_accessed = CURRENT_DATE
-              WHEN TRUE THEN views
-              WHEN FALSE THEN views + 1
-            END
-        WHERE id = :id
-        RETURNING *
-    """
-
-    query = UPDATE_QUERY if action == "update" else INSERT_QUERY
     body = json.loads(request.body)
     notes, title, url, keywords = itemgetter(
         "notes",
@@ -237,13 +206,47 @@ def add_or_update(request, action: str) -> HttpResponse:
 @csrf_exempt
 # @api_view(['POST', 'PUT'])
 def add_link(request):
-    return add_or_update(request, "add")
+    # TODO: auth with request.user.id
+
+    # temp measure, the @api_view decorator will do this in the future
+    if request.method != "POST" and request.method != "PUT":
+        return HttpResponse(status=405)
+
+    INSERT_QUERY = """
+        INSERT INTO api_link (id, notes, title, url, keywords, last_accessed, user_id, flag, start_time)
+        VALUES (nextval('api_link_id_seq'::regclass), :notes, :title, :url, :keywords, NOW(), 2, FALSE, :start_time)
+        ON CONFLICT (url) DO UPDATE SET url = :url
+        RETURNING *
+    """
+    return add_or_update(request, "add", query=INSERT_QUERY)
 
 
 @csrf_exempt
 # @api_view(['POST', 'PUT'])
 def update_link(request) -> HttpResponse:
-    return add_or_update(request, "update")
+    # TODO: auth with request.user.id
+
+    # temp measure, the @api_view decorator will do this in the future
+    if request.method != "POST" and request.method != "PUT":
+        return HttpResponse(status=405)
+    UPDATE_QUERY = """
+        UPDATE api_link
+        SET keywords = :keywords,
+          title = :title,
+          url = :url,
+          notes = :notes,
+          flag = :flag,
+          last_accessed = NOW(),
+          start_time = :start_time,
+          views =
+            CASE last_accessed = CURRENT_DATE
+              WHEN TRUE THEN views
+              WHEN FALSE THEN views + 1
+            END
+        WHERE id = :id
+        RETURNING *
+    """
+    return add_or_update(request, "update", query=UPDATE_QUERY)
 
 
 @csrf_exempt
