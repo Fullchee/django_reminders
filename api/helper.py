@@ -1,6 +1,5 @@
 import json
-import urllib
-import urllib.request
+from urllib import parse, request
 from re import search
 from typing import Tuple, Optional
 
@@ -91,10 +90,11 @@ def generate_youtube_title(url: str) -> str:
     }
 
     url = "https://www.youtube.com/oembed"
-    query_string = urllib.parse.urlencode(params)
+    query_string = parse.urlencode(params)
     url = url + "?" + query_string
 
-    with urllib.request.urlopen(url) as response:
+    with request.urlopen(url) as response:
         response_text = response.read()
         data = json.loads(response_text.decode())
         return f"{data['author_name']}: {data['title']}"
+

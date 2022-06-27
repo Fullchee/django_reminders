@@ -1,23 +1,27 @@
 import json
-import sqlalchemy as sql
+import logging
+from operator import itemgetter
+from urllib.error import HTTPError
 
-from django.core.serializers import serialize
+import sqlalchemy as sql
 from django.db import connection
 from django.http import HttpResponse
 from django.shortcuts import render
 from django.views.decorators.csrf import csrf_exempt
-from operator import itemgetter
 from rest_framework import permissions, status
-from rest_framework.decorators import api_view
+
+# from rest_framework.decorators import api_view
 from rest_framework.renderers import JSONRenderer
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from sqlalchemy.dialects import postgresql
 
-from .models import Link
+# from .models import Link
 from api.serializers import UserSerializer, UserSerializerWithToken
-
 from .helper import parse_keywords, extract_youtube_info, generate_youtube_title
+from .responses import JsonResponseServerError, JsonResponseForbidden
+
+logger = logging.getLogger(__name__)
 
 
 # @api_view(['GET'])
@@ -178,7 +182,17 @@ def add_or_update(request, action: str, query: str) -> HttpResponse:
 
     keywords = parse_keywords(keywords)
     url, youtube_start_time = extract_youtube_info(url)
-    title = title or generate_youtube_title(url)
+    try:
+        title = title or generate_youtube_title(url)
+    except HTTPError as e:
+        logger.error(repr(e))
+        if e.code == 401:
+            error_message = "The YouTube video's author may have disabled playback outside of YouTube"
+            logger.error(error_message)
+            return JsonResponseForbidden({"message": error_message})
+        # return JsonResponseServerError(e)
+    except Exception as e:
+        return JsonResponseServerError(e)
 
     # prioritize the form start time over the YouTube URL (which might be outdated)
     start_time = (start_time and int(start_time)) or youtube_start_time or 0
