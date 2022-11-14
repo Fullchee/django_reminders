@@ -48,6 +48,7 @@ ALLOWED_HOSTS = [
     "localhost",
     "fullchee-reminders.herokuapp.com",
     "fullchee-reminders.up.railway.app",
+    "fullchee-reminders.onrender.com",
 ]
 
 # Application definition
