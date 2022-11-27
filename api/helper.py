@@ -45,11 +45,16 @@ def get_youtube_url_matches(url: str):
         "youtube.com%2Fwatch%3Fv%3D([a-zA-Z0-9-_]{11})",
         url,
     )
+    youtube_short_match = search(
+        "youtube.com/shorts/([a-zA-Z0-9-_]{11})",
+        url,
+    )
     return [
         desktop_match,
         shortened_youtube_match,
         firefox_android_mobile_match,
         firefox_android_desktop_match,
+        youtube_short_match,
     ]
 
 def get_youtube_time(url: str) -> int:
