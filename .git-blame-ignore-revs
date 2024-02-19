@@ -1,0 +1,6 @@
+# Run to ignore these commits on every call to `git blame`
+# git config --global blame.ignoreRevsFile .git-blame-ignore-revs
+
+# Refactoring dashboard_etl_manager
+
+# Black formatting (multiple commits)
