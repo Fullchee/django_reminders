@@ -143,6 +143,9 @@ DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
 CORS_ORIGIN_WHITELIST = (
     "http://localhost:3000",
+    # vite
+    "http://localhost:5173",
+    "http://localhost:5174",
     "http://localhost:8100",
     "capacitor://localhost",
     "ionic://localhost",
