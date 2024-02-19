@@ -90,6 +90,15 @@ def get_all_links(request):
 
 # @api_view(['GET'])
 def get_random_link(request):
+    """
+from random import choice
+
+pks = A.objects.values_list('pk', flat=True)
+random_pk = choice(pks)
+random_obj = A.objects.get(pk=random_pk)
+
+`MyModel.objects.order_by('?').first()` can be very slow
+    """
     with connection.cursor() as cursor:
         cursor.execute(
             sql_text(

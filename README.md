@@ -3,11 +3,11 @@
 ## Links
 
 - Frontend React App
-  - [Website](https://fullchee-reminders.netlify.app/)
-  - [GitHub](https://github.com/Fullchee/values-client)
+  - [▶︎ Website](https://fullchee-reminders.netlify.app/)
+  - [:octocat: GitHub](https://github.com/Fullchee/reminders-frontend)
 - Backend
-  - [GitHub](https://github.com/Fullchee/django_reminders)
-  - Postgres, Node, Express
+  - [:octocat: GitHub](https://github.com/Fullchee/django_reminders)
+  - Django, Postgres
 
 ## Setup
 
@@ -27,14 +27,10 @@
    * `cp sample.env .env`
 5. Start the Django app with the environment variables
 
-
 ```sh
 PYTHONUNBUFFERED=1;
 DJANGO_SETTINGS_MODULE=django_reminders.settings
 ```
-
-### .env
-In `django_reminders/.env`
 
 
 ## Decisions
@@ -53,7 +49,6 @@ I decided to redo the backend with Django
 
 * I was hired as a full stack developer at Forma.ai.
 * and wanted some practice with their tech stack
-
 
 ### Why not pipenv`
 
