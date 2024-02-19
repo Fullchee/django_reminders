@@ -3,7 +3,7 @@
 ## Links
 
 - Frontend React App
-  - [▶︎ Website](https://fullchee-reminders.netlify.app/)
+  - [🌐︎ Website](https://fullchee-reminders.netlify.app/)
   - [:octocat: GitHub](https://github.com/Fullchee/reminders-frontend)
 - Backend
   - [:octocat: GitHub](https://github.com/Fullchee/django_reminders)
