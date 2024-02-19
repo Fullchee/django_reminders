@@ -11,21 +11,21 @@
 
 ## Setup
 
-### Requirements
 * Python 3.9+
 * Postgres 13.2+
 
-1. Create a virtual environment
-   
-   * `python -m venv venv`
-   * `source venv/bin/activate
 
-2. `python install -r ./requirements.txt`
+1. Run `./build.sh`
+   1. Old way: Create a virtual environment
+   
+      * `python -m venv venv`
+      * `source venv/bin/activate
+      2. `python install -r ./requirements.txt`
+2. `pipenv shell`
 3. `python manage.py migrate`
-4. Add the env variables to your `~/.zshrc`
-5. Copy and override the environment variables
+4. Copy and override the environment variables
    * `cp sample.env .env`
-5. Start the Django app with the environment variables
+4. Add the env variables to your `~/.zshrc` 
 
 ```sh
 PYTHONUNBUFFERED=1;
