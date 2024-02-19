@@ -25,7 +25,8 @@
 3. `python manage.py migrate`
 4. Copy and override the environment variables
    * `cp sample.env .env`
-4. Add the env variables to your `~/.zshrc` 
+5. Add the env variables to your `~/.zshrc`
+6. Uncomment out `~/.config/pip/pip.conf`
 
 ```sh
 PYTHONUNBUFFERED=1;
