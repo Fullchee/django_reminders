@@ -97,9 +97,21 @@ class LinkView(APIView):
         return JsonResponse(self.OutputSerializer(Link.objects.all(), many=True))
 
     class InputSerializer(serializers.Serializer):
-        name = serializers.CharField()
-        start_date = serializers.DateField()
-        end_date = serializers.DateField()
+        title = serializers.CharField()
+        keywords = serializers.ArrayField()
+        url = serializers.URLField()
+        last_accessed = serializers.DateField()
+        """TODO: do I need to do anything to get this to auto update?"""
+        views = serializers.IntegerField()
+        """ TODO: increment by 1"""
+        flag = serializers.BooleanField()
+
+        # do we intentionally not include this here
+        # so that it doesn't create model instances?
+        # class Meta:
+        #     model = Link
+
+        # TODO: how to set the url and title?
 
         def calculate_youtube_url(self, link: Link):
             return calculate_youtube_url(link)
@@ -107,13 +119,17 @@ class LinkView(APIView):
         def calculate_title(self, link: Link):
             return calculate_title(link)
 
-    def put(self, request: Request, link_id: Optional[int]) -> Response:
-        serializer = self.InputSerializer(data=request.data)
-        serializer.is_valid(raise_exception=True)
+    class UpdateInputSerializer(InputSerializer):
+        id = serializers.IntegerField()
 
+    def put(self, request: Request, link_id: Optional[int]) -> Response:
         if link_id:
+            serializer = self.UpdateInputSerializer(data=request.data)
+            serializer.is_valid(raise_exception=True)
             update_link_sql(**serializer.validated_data)
         else:
+            serializer = self.InputSerializer(data=request.data)
+            serializer.is_valid(raise_exception=True)
             create_link(**serializer.validated_data)
 
     def delete(self, request: Request, link_id: int) -> Response:
