@@ -41,7 +41,7 @@ I decided to redo the backend with Django
 
 ### Why poetry
 
-At work, we use virtual environments so the first installment of `django_reminders` was the same as at work. 
+At work, we use virtual environments so the first installment of `django_reminders` was the same as at work.
 
 I'm deployed on render.com's free tier and the existing virtual environments just worked.
 
