@@ -10,22 +10,35 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/5.0/ref/settings/
 """
 
+import environ
+import os
 from pathlib import Path
+
+env = environ.Env(
+    # set casting, default value
+    DEBUG=(bool, False)
+)
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
+
+environ.Env.read_env(os.path.join(BASE_DIR, ".env"))
+
+# False if not in os.environ because of casting above
+DEBUG = env("DEBUG")
 
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/5.0/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = "django-insecure-&jahe!#!!sl^9&%v8$nbw&c1ibv(voss1=%afv$3r3bd2vstwq"
+SECRET_KEY = env.str("SECRET_KEY")
 
-# SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
-
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = [
+    "127.0.0.1",
+    "localhost",
+    "fullchee-reminders.onrender.com",
+]
 
 
 # Application definition
@@ -72,12 +85,9 @@ WSGI_APPLICATION = "django_reminders.wsgi.application"
 
 # Database
 # https://docs.djangoproject.com/en/5.0/ref/settings/#databases
-
 DATABASES = {
-    "default": {
-        "ENGINE": "django.db.backends.sqlite3",
-        "NAME": BASE_DIR / "db.sqlite3",
-    }
+    # read os.environ['DATABASE_URL'] and raises ImproperlyConfigured exception if not found
+    "default": env.db("DATABASE_URL"),
 }
 
 
@@ -121,3 +131,46 @@ STATIC_URL = "static/"
 # https://docs.djangoproject.com/en/5.0/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
+
+
+# -------- End of Django auto-generated fields --------
+
+CORS_ORIGIN_WHITELIST = (
+    "http://localhost:5173",  # vite
+    "http://localhost:5174",  # vite
+    "http://localhost:8100",  # ?
+    "http://localhost",  # ?
+    "http://localhost:8080",  # ?
+    "capacitor://localhost",
+    "ionic://localhost",
+    "https://fullchee-reminders.netlify.app",
+)
+
+TINYMCE_DEFAULT_CONFIG = {
+    "height": 360,
+    "width": 750,
+    "cleanup_on_startup": True,
+    "custom_undo_redo_levels": 20,
+    "selector": "textarea",
+    "theme": "modern",
+    "plugins": """
+   textcolor save link image media preview codesample contextmenu
+   table code lists fullscreen insertdatetime nonbreaking
+   contextmenu directionality searchreplace wordcount visualblocks
+   visualchars code fullscreen autolink lists charmap print hr
+   anchor pagebreak
+   """,
+    "toolbar1": """
+   fullscreen preview bold italic underline | fontselect,
+   fontsizeselect | forecolor backcolor | alignleft alignright |
+   aligncenter alignjustify | indent outdent | bullist numlist table |
+   | link image media | codesample |
+   """,
+    "toolbar2": """
+   visualblocks visualchars |
+   charmap hr pagebreak nonbreaking anchor | code |
+   """,
+    "contextmenu": "formats | link image",
+    "menubar": True,
+    "statusbar": True,
+}
