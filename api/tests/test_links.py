@@ -156,5 +156,10 @@ class TestLink(TestCase):
 
     def test_404_when_deleting_link_with_id_that_doesnt_exist(self):
         """DELETE /api/v1/links/1"""
-        response = self.client.put(reverse("links", kwargs={"link_id": 1}))
+        response = self.client.delete(reverse("links", kwargs={"link_id": 1}))
         self.assertEqual(status.HTTP_404_NOT_FOUND, response.status_code)
+
+    def test_405_when_deleting_without_providing_link_id(self):
+        """DELETE /api/v1/links"""
+        response = self.client.delete(reverse("links"))
+        self.assertEqual(status.HTTP_405_METHOD_NOT_ALLOWED, response.status_code)

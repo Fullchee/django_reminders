@@ -14,7 +14,7 @@ urlpatterns = [
     path("random-link", views.get_random_link_sql),
     path("search", views.search),
     path("add-link", views.add_link),
-    path("update-link", views.update_link),
+    path("update-link", views.update_link_sql),
     path("delete-link", views.delete_link),
     # end of deprecated link endpoints
 ]

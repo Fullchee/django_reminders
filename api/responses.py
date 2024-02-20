@@ -52,6 +52,16 @@ class JsonResponseNotFound(JsonResponse):
         super().__init__({"error": data}, status=404, **kwargs)
 
 
+class JsonResponseMethodNotAllowed(JsonResponse):
+    """JSON 405 error"""
+
+    def __init__(self, data: Optional[dict] = None, **kwargs):
+        if data is None:
+            data = {}
+        data.setdefault("message", "Not found")
+        super().__init__({"error": data}, status=405, **kwargs)
+
+
 class JsonResponseServerError(JsonResponse):
     """Generic 500 error"""
 

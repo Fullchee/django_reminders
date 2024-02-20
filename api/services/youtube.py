@@ -83,8 +83,12 @@ def extract_youtube_info(url: str) -> Tuple[str, Optional[int]]:
 def generate_youtube_title(url: str) -> str:
     """
     https://stackoverflow.com/a/52664178/8479344
-    :param url: YouTube URL
-    :return: str - f"{author name}: {video title}"
+
+    Returns:
+        f"{author name}: {video title}"
+
+    Throws:
+        HTTPError
     """
     youtube_id = get_youtube_id(url)
     if not youtube_id:

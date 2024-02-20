@@ -1,6 +1,7 @@
 import json
 import logging
 from operator import itemgetter
+from typing import Optional
 from urllib.error import HTTPError
 
 from django.db import connection
@@ -13,12 +14,20 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 
 from api.models import Link
-from api.responses import (JsonResponse, JsonResponseForbidden,
-                           JsonResponseNotFound, JsonResponseServerError)
+from api.responses import (
+    JsonResponse,
+    JsonResponseForbidden,
+    JsonResponseMethodNotAllowed,
+    JsonResponseNotFound,
+    JsonResponseServerError,
+)
 from api.services.link_services import get_random_link, search_links
 from api.services.raw_sql import fetchall_as_dict, sql_text
-from api.services.youtube import (extract_youtube_info, generate_youtube_title,
-                                  is_youtube_url)
+from api.services.youtube import (
+    extract_youtube_info,
+    generate_youtube_title,
+    is_youtube_url,
+)
 
 logger = logging.getLogger(__name__)
 
@@ -66,7 +75,7 @@ class LinkView(APIView):
                 "start_time",
             )
 
-    def get(self, request: Request, link_id: int) -> Response:
+    def get(self, request: Request, link_id: Optional[int]) -> Response:
         if link_id:
             try:
                 link = Link.objects.get(id=link_id)
@@ -86,16 +95,29 @@ class LinkView(APIView):
 
         return JsonResponse(self.OutputSerializer(Link.objects.all(), many=True))
 
-    def put(self, request: Request) -> Response:
-        def add_time_to_youtube_url(link: Link) -> str:
+    class InputSerializer(serializers.Serializer):
+        name = serializers.CharField()
+        start_date = serializers.DateField()
+        end_date = serializers.DateField()
+
+        def add_time_to_youtube_url(self, link: Link) -> str:
             if link.url and is_youtube_url(link.url):
                 return f"{link.url}?t={link.start_time or 0}"
             return link.url or ""
 
-        return JsonResponse({})
+    def put(self, request: Request, link_id: Optional[int]) -> Response:
+        serializer = self.InputSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
 
-    def delete(self, request: Request) -> Response:
-        return JsonResponse({})
+        if link_id:
+            update_link_sql(**serializer.validated_data)
+        else:
+            create_link(**serializer.validated_data)
+
+    def delete(self, request: Request, link_id: int) -> Response:
+        if not link_id:
+            return JsonResponseMethodNotAllowed()
+        return JsonResponse({"success": "Deleted link"})
 
 
 # @api_view(['GET'])
@@ -167,13 +189,12 @@ def search(request):
         return JsonResponse(result)
 
 
-def add_or_update(request, action: str, query: str) -> HttpResponse:
+def add_or_update(body, action: str, query: str) -> HttpResponse:
     """
-    :param request:
+    :param body:
     :param action: 'add' or 'update'
     :param query: insert or update query
     """
-    body = json.loads(request.body)
     notes, title, url, keywords = itemgetter(
         "notes",
         "title",
@@ -238,12 +259,12 @@ def add_link(request):
         ON CONFLICT (url) DO UPDATE SET url = :url
         RETURNING *
     """
-    return add_or_update(request, "add", query=INSERT_QUERY)
+    return add_or_update(json.loads(request.body), "add", query=INSERT_QUERY)
 
 
 @csrf_exempt
 # @api_view(['POST', 'PUT'])
-def update_link(request) -> HttpResponse:
+def update_link_sql(request) -> HttpResponse:
     # TODO: auth with request.user.id
 
     # temp measure, the @api_view decorator will do this in the future
@@ -266,7 +287,7 @@ def update_link(request) -> HttpResponse:
         WHERE id = :id
         RETURNING *
     """
-    return add_or_update(request, "update", query=UPDATE_QUERY)
+    return add_or_update(json.loads(request.body), "update", query=UPDATE_QUERY)
 
 
 @csrf_exempt
