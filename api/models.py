@@ -4,10 +4,14 @@ from django.db import models
 
 
 class Link(models.Model):
+    """
+    TODO: url + start_time should be unique
+    """
+
     id = models.BigAutoField(primary_key=True, null=False)
     title = models.CharField(max_length=200, null=True)
     keywords = ArrayField(models.CharField(max_length=200), null=True, blank=True)
-    url = models.URLField(max_length=1000, null=True, unique=True)
+    url = models.URLField(max_length=1000)
     notes = models.TextField(null=True, blank=True)
     last_accessed = models.DateField(auto_now_add=True, blank=True)
     views = models.PositiveIntegerField(default=0)  # view count
@@ -16,7 +20,7 @@ class Link(models.Model):
 
     # in seconds
     # will override the `t` query param in the URL for YouTube videos
-    start_time = models.PositiveIntegerField(default=0)
+    start_time = models.PositiveIntegerField(default=0, db_default=0)
 
     class LinkTypes(models.TextChoices):
         PODCAST = "PODCAST", "Podcast"
@@ -36,11 +40,3 @@ class Link(models.Model):
                 ]
             )
         ]
-
-
-class Quote(models.Model):
-    text = models.TextField(null=True)
-    author = models.CharField(max_length=200)
-
-    def __str__(self):
-        return self.text

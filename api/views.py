@@ -21,7 +21,7 @@ from api.responses import (
     JsonResponseNotFound,
     JsonResponseServerError,
 )
-from api.services.link_services import get_random_link, search_links
+from api.services.link_services import create_link, get_random_link, search_links
 from api.services.raw_sql import fetchall_as_dict, sql_text
 from api.services.youtube import (
     extract_youtube_info,
@@ -100,10 +100,27 @@ class LinkView(APIView):
         start_date = serializers.DateField()
         end_date = serializers.DateField()
 
-        def add_time_to_youtube_url(self, link: Link) -> str:
+        def calculate_youtube_url(self, link: Link):
+            if not link.url:
+                # TODO: throw a validation error?
+                return ""
             if link.url and is_youtube_url(link.url):
                 return f"{link.url}?t={link.start_time or 0}"
             return link.url or ""
+        def calculate_title(self, link: Link):
+            if not link.url:
+                return ""
+            url, youtube_start_time = extract_youtube_info(link.url)
+
+            try:
+                title = link.title or generate_youtube_title(url)
+            except HTTPError as e:
+                logger.error(repr(e))
+                if e.code == 401:
+                    error_message = "The YouTube video's author may have disabled playback outside of YouTube"
+                    logger.error(error_message)
+                    return JsonResponseForbidden({"message": error_message})
+                # return JsonResponseServerError(e)
 
     def put(self, request: Request, link_id: Optional[int]) -> Response:
         serializer = self.InputSerializer(data=request.data)

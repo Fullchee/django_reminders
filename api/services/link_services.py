@@ -35,13 +35,18 @@ def search_links(search_term: str) -> "QuerySet[Link]":
     )
 
 
-def update_link(link):
+def create_link(link: Link) -> Link:
     """
+        INSERT INTO api_link (id, notes, title, url, keywords, last_accessed, user_id, flag, start_time)
+    VALUES (nextval('api_link_id_seq'::regclass), :notes, :title, :url, :keywords, NOW(), 2, FALSE, :start_time)
+    ON CONFLICT (url) DO UPDATE SET url = :url
+    RETURNING *
+    """
+    return Link.objects.create(**link)
 
-    TODO: create a type for link Partial<dict version of Link>
 
-    TODO: can I use the output serializer return value?
-
+def update_link(link: Link):
+    """
     UPDATE api_link
     SET keywords = :keywords,
       title = :title,

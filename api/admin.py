@@ -1,12 +1,11 @@
 from django.contrib import admin
-
-from .models import Link, Quote
+from django.db import models
+from api.models import Link
+from tinymce.widgets import TinyMCE
 
 
 @admin.register(Link)
 class LinkAdmin(admin.ModelAdmin):
-    list_display = ("title", "keywords")
+    list_display = ("last_accessed", "title", "keywords")
     list_filter = ("keywords",)
-
-
-admin.site.register(Quote)
+    formfield_overrides = {models.TextField: {"widget": TinyMCE()}}
