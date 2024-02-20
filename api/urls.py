@@ -1,7 +1,6 @@
 from django.urls import include, path
 
-from . import views
-from . import views_sql
+from . import views, views_sql
 
 urlpatterns = [
     path("", views.redirect_to_frontend),

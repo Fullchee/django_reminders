@@ -1,7 +1,8 @@
 from django.contrib import admin
 from django.db import models
-from api.models import Link
 from tinymce.widgets import TinyMCE
+
+from api.models import Link
 
 
 @admin.register(Link)

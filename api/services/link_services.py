@@ -34,6 +34,7 @@ def search_links(search_term: str) -> "QuerySet[Link]":
         Q(question__startswith="Who") | Q(question__startswith="What")
     )
 
+
 def create_link(link: Link) -> Link:
     """
         INSERT INTO api_link (id, notes, title, url, keywords, last_accessed, user_id, flag, start_time)
