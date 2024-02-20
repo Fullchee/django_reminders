@@ -27,7 +27,7 @@
 
 **Previous API (GraphQL) Backend App**
 
-* https://github.com/Fullchee/reminders-backend/blob/master/src/index.js
+- https://github.com/Fullchee/reminders-backend/blob/master/src/index.js
 
 **Why I switched away from GraphQL**
 
@@ -35,11 +35,10 @@ I heard a lot about GraphQL APIs, so I decided to implement one for this project
 
 I decided to redo the backend with Django
 
-* I was hired as a full stack developer at Forma.ai.
-* and wanted some practice with their tech stack
+- I was hired as a full stack developer at Forma.ai.
+- and wanted some practice with their tech stack
 
-
-### Why poetry
+### Why poetry (2024)
 
 At work, we use virtual environments so the first installment of `django_reminders` was the same as at work.
 
