@@ -9,7 +9,7 @@ readme = "README.md"
 python = "^3.12"
 django = "^5.0.2"
 django-environ = "^0.11.2"  # used in settings.py
-django-tinymce = "^3.7.1"
+django-tinymce = "^3.7.1"   # for TinyMCE in Django admin
 djangorestframework = "^3.14.0"
 django-cors-headers = "^4.3.1"  # used in settings.py
 

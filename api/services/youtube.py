@@ -3,8 +3,32 @@ import logging
 from re import search
 from typing import Optional, Tuple
 from urllib import parse, request
+from urllib.error import HTTPError
+
+from api.models import Link
 
 logger = logging.getLogger(__name__)
+
+
+def calculate_youtube_url(link: Link) -> str:
+    url, youtube_start_time = extract_youtube_info(link.url)
+    if not youtube_start_time:
+        return url
+    return f"{link.url}?t={link.start_time or 0}"
+
+
+def calculate_title(link: Link) -> str:
+    url, _ = extract_youtube_info(link.url)
+
+    try:
+        return link.title or generate_youtube_title(url)
+    except HTTPError as e:
+        logger.error(repr(e))
+        if e.code == 401:
+            logger.error(
+                "The YouTube video's author may have disabled playback outside of YouTube"
+            )
+        return link.title or ""
 
 
 def get_youtube_id(url: str) -> str:
