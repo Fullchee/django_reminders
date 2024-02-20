@@ -1,14 +1,12 @@
-from django.urls import path, include
+from django.urls import include, path
 
 from . import views
-
 
 urlpatterns = [
     path("", views.redirect_to_frontend),
     path("keywords", views.get_keywords),
     path("v1/links/<int:link_id>", views.LinkView.as_view(), name="link"),
     path("v1/links", views.LinkView.as_view(), name="links"),
-
     # TODO: deprecate these v0 link endpoints
     path("links", views.get_all_links),
     path("links/<int:link_id>", views.get_link),

@@ -1,9 +1,8 @@
 import json
-from urllib import parse, request
-from re import search
-from typing import Tuple, Optional
-
 import logging
+from re import search
+from typing import Optional, Tuple
+from urllib import parse, request
 
 logger = logging.getLogger(__name__)
 
@@ -22,6 +21,7 @@ def get_youtube_id(url: str) -> str:
         except Exception as e:
             pass
     return ""
+
 
 def is_youtube_url(url: str) -> bool:
     return bool(get_youtube_id(url))

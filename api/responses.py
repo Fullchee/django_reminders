@@ -17,18 +17,19 @@ class JsonResponse(HttpResponse):
 
     def __init__(self, data, *, use_gzip=False, **kwargs):
         content = JSONRenderer().render(data)
-        kwargs['content_type'] = 'application/json'
+        kwargs["content_type"] = "application/json"
         if use_gzip:
             content = gzip.compress(content)
 
         super().__init__(content, **kwargs)
 
         if use_gzip:
-            self['Content-Encoding'] = 'gzip'
+            self["Content-Encoding"] = "gzip"
 
 
 class JsonResponseBadRequest(JsonResponse):
     """JSON 400 error"""
+
     def __init__(self, data: Optional[ErrorObject] = None, **kwargs):
         if data is None:
             data = {}
@@ -38,6 +39,7 @@ class JsonResponseBadRequest(JsonResponse):
 
 class JsonResponseForbidden(JsonResponse):
     """JSON 403 error"""
+
     def __init__(self, data: Optional[ErrorObject] = None, **kwargs):
         if data is None:
             data = {}
@@ -47,6 +49,7 @@ class JsonResponseForbidden(JsonResponse):
 
 class JsonResponseNotFound(JsonResponse):
     """JSON 404 error"""
+
     def __init__(self, data: Optional[ErrorObject] = None, **kwargs):
         if data is None:
             data = {}
@@ -56,6 +59,7 @@ class JsonResponseNotFound(JsonResponse):
 
 class JsonResponseServerError(JsonResponse):
     """Generic 500 error"""
+
     def __init__(self, data: Optional[ErrorObject] = None, **kwargs):
         if data is None:
             data = {}

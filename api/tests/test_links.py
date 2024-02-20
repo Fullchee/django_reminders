@@ -1,6 +1,7 @@
+import json
+
 from django.test import TestCase
 from django.urls import reverse
-import json
 from rest_framework import status
 
 
@@ -14,7 +15,6 @@ class TestLink(TestCase):
         # create two links
         self.client.get(reverse("links"))
         # expect 2 links
-
 
     def test_get_random_link(self):
         """GET /api/v1/links?random"""
@@ -64,7 +64,6 @@ class TestLink(TestCase):
             content_type="application/json",
         )
         # it should return a 400 error, bad input data
-
 
     def test_404_when_deleting_link_with_id_that_doesnt_exist(self):
         """DELETE /api/v1/links/1"""

@@ -1,5 +1,6 @@
 from random import choice
 from typing import List
+
 from django.db.models import Q
 
 from api.models import Link
@@ -13,7 +14,8 @@ def get_random_link() -> Link:
     random_pk = choice(pks)
     return Link.objects.get(pk=random_pk)
 
-def search_links(search_term: str) -> 'QuerySet[Link]':
+
+def search_links(search_term: str) -> "QuerySet[Link]":
     """
     TODO: add django-stubs
     poetry install django-stubs --group dev
@@ -28,4 +30,6 @@ def search_links(search_term: str) -> 'QuerySet[Link]':
         :query = ANY(keywords)
         )
     """
-    return Link.objects.filter(Q(question__startswith='Who') | Q(question__startswith='What'))
+    return Link.objects.filter(
+        Q(question__startswith="Who") | Q(question__startswith="What")
+    )

@@ -13,14 +13,12 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 
 from api.models import Link
-from api.responses import JsonResponse, JsonResponseForbidden, JsonResponseServerError
+from api.responses import (JsonResponse, JsonResponseForbidden,
+                           JsonResponseServerError)
 from api.services.link_services import get_random_link, search_links
 from api.services.raw_sql import fetchall_as_dict, sql_text
-from api.services.youtube import (
-    extract_youtube_info,
-    generate_youtube_title,
-    is_youtube_url,
-)
+from api.services.youtube import (extract_youtube_info, generate_youtube_title,
+                                  is_youtube_url)
 
 logger = logging.getLogger(__name__)
 
