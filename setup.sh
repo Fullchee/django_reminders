@@ -4,3 +4,4 @@ set -o errexit
 
 ./build.sh
 git update-index --assume-unchanged .env
+pre-commit install
