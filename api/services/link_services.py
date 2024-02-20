@@ -8,6 +8,7 @@ from api.models import Link
 
 def get_random_link() -> Link:
     """
+    Guaranteed to not throw, the first migration will create the sample data
     `Link.objects.order_by('?').first()` can be very slow
     """
     pks = Link.objects.values_list("pk", flat=True)

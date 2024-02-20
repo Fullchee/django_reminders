@@ -18,3 +18,4 @@ class LinkFactory(factory.django.DjangoModelFactory):
     views = 2
     user = factory.SubFactory(UserFactory)
     flag = False
+    start_time = 0
