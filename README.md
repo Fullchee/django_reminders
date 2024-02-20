@@ -50,4 +50,12 @@ However, I was getting some issues upgrading Django.
 
 So, I'm trying poetry and I'm liking the DX which is similar to what I'm used to from the JavaScript ecosystem.
 
-I've heard good things about pytest. However, we use `unittest` at work so I'm gonna stick with that.
+### `pytest` vs `unittest`
+
+I've heard good things about `pytest`. However, we use `unittest` at work so I'm gonna stick with that.
+
+### How the code is structured
+
+I'm following the structure of this talk where most of the business logic goes into services
+
+- https://www.youtube.com/embed/yG3ZdxBb1oo
