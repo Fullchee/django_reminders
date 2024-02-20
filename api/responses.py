@@ -1,13 +1,8 @@
 import gzip
-from typing import NotRequired, Optional, TypedDict
+from typing import Optional
 
 from django.http import HttpResponse
 from rest_framework.renderers import JSONRenderer
-
-
-class ErrorObject(TypedDict):
-    title: NotRequired[str]
-    message: str
 
 
 class JsonResponse(HttpResponse):
@@ -30,7 +25,7 @@ class JsonResponse(HttpResponse):
 class JsonResponseBadRequest(JsonResponse):
     """JSON 400 error"""
 
-    def __init__(self, data: Optional[ErrorObject] = None, **kwargs):
+    def __init__(self, data: Optional[dict] = None, **kwargs):
         if data is None:
             data = {}
         data.setdefault("message", "Bad request")
@@ -40,7 +35,7 @@ class JsonResponseBadRequest(JsonResponse):
 class JsonResponseForbidden(JsonResponse):
     """JSON 403 error"""
 
-    def __init__(self, data: Optional[ErrorObject] = None, **kwargs):
+    def __init__(self, data: Optional[dict] = None, **kwargs):
         if data is None:
             data = {}
         data.setdefault("message", "Forbidden")
@@ -50,7 +45,7 @@ class JsonResponseForbidden(JsonResponse):
 class JsonResponseNotFound(JsonResponse):
     """JSON 404 error"""
 
-    def __init__(self, data: Optional[ErrorObject] = None, **kwargs):
+    def __init__(self, data: Optional[dict] = None, **kwargs):
         if data is None:
             data = {}
         data.setdefault("message", "Not found")
@@ -60,7 +55,7 @@ class JsonResponseNotFound(JsonResponse):
 class JsonResponseServerError(JsonResponse):
     """Generic 500 error"""
 
-    def __init__(self, data: Optional[ErrorObject] = None, **kwargs):
+    def __init__(self, data: Optional[dict] = None, **kwargs):
         if data is None:
             data = {}
         data.setdefault("message", "Internal server error")

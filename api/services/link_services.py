@@ -1,5 +1,4 @@
 from random import choice
-from typing import List
 
 from django.db.models import Q
 

@@ -14,7 +14,7 @@ from rest_framework.views import APIView
 
 from api.models import Link
 from api.responses import (JsonResponse, JsonResponseForbidden,
-                           JsonResponseServerError)
+                           JsonResponseNotFound, JsonResponseServerError)
 from api.services.link_services import get_random_link, search_links
 from api.services.raw_sql import fetchall_as_dict, sql_text
 from api.services.youtube import (extract_youtube_info, generate_youtube_title,
@@ -68,8 +68,13 @@ class LinkView(APIView):
 
     def get(self, request: Request, link_id: int) -> Response:
         if link_id:
-            # return 404 if the link_id doesn't exist
-            return JsonResponse({})
+            try:
+                link = Link.objects.get(id=link_id)
+                return JsonResponse(self.OutputSerializer(link))
+            except Link.DoesNotExist:
+                return JsonResponseNotFound(
+                    {"message": f"No link with provided link ID exists"}
+                )
         if request.GET.get("random"):
             link = get_random_link()
             return JsonResponse(self.OutputSerializer(link))
@@ -192,7 +197,8 @@ def add_or_update(request, action: str, query: str) -> HttpResponse:
             return JsonResponseForbidden({"message": error_message})
         # return JsonResponseServerError(e)
     except Exception as e:
-        return JsonResponseServerError(e)
+        logger.error(e)
+        return JsonResponseServerError()
 
     # prioritize the form start time over the YouTube URL (which might be outdated)
     start_time = (start_time and int(start_time)) or youtube_start_time or 0
