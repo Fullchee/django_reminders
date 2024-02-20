@@ -2,5 +2,5 @@
 # exit on error
 set -o errexit
 
-cp sample.env .env
 ./build.sh
+git update-index --assume-unchanged .env

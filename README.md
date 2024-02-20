@@ -13,6 +13,7 @@
 ## Setup
 
 1. [Install poetry](https://python-poetry.org/docs/)
+   1. Install `poetry self add poetry-dotenv-plugin`
 2. `cp sample.env .env`
 3. Run `./setup.sh`
    1. runs `poetry install`
