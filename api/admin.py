@@ -1,3 +1,12 @@
 from django.contrib import admin
 
-# Register your models here.
+from .models import Link, Quote
+
+
+@admin.register(Link)
+class LinkAdmin(admin.ModelAdmin):
+    list_display = ("title", "keywords")
+    list_filter = ("keywords",)
+
+
+admin.site.register(Quote)
