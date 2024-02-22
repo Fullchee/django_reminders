@@ -13,6 +13,11 @@ django-tinymce = "^3.7.1"   # for TinyMCE in Django admin
 djangorestframework = "^3.14.0"
 django-cors-headers = "^4.3.1"  # used in settings.py
 
+# allow the use of QuerySet[MyModel]
+# https://github.com/typeddjango/django-stubs#i-cannot-use-queryset-or-manager-with-type-annotations
+# https://github.com/typeddjango/django-stubs/tree/master/ext
+# django-stubs-ext = "^5"
+
 
 [tool.poetry.group.test.dependencies]
 factory-boy = "^3.3.0"
@@ -21,6 +26,7 @@ factory-boy = "^3.3.0"
 [tool.poetry.group.dev.dependencies]
 black = "^24.2.0"
 isort = "^5.13.2"
+mypy = "^1.8.0"
 pre-commit = "^3.6.2"
 
 [build-system]
